@@ -1,21 +1,18 @@
-#include <ctype.h>
 #include <iostream>
 #include <unordered_map>
 #include <string>
+#include <fstream>
 
 // Variables
 int charClass;
-char lexeme[100];
+std::string lexeme;
 char nextChar;
-int lexLen;
-int token;
 int nextToken;
-FILE *in_fp, *fopen();
+std::ifstream readFile;
 
 // Functions
 void addChar();
 void getChar();
-void skipWhitespace();
 int lex();
 
 // Character classes
@@ -36,9 +33,10 @@ int lex();
 
 int main()
 {
-    if ((in_fp = fopen("../front.in", "r")) == nullptr)
+    readFile.open("../front.in");
+    if (!readFile.is_open())
     {
-        std::cout << "ERROR - Cannot open front.in" << std::endl;
+        std::cerr << "ERROR - Cannot open front.in" << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -48,6 +46,7 @@ int main()
         lex();
     } while (nextToken != EOF);
 
+    readFile.close();
     return EXIT_SUCCESS;
 }
 
@@ -72,16 +71,12 @@ int lookUp(char ch)
 
 void addChar()
 {
-    if (lexLen >= 99)
-        std::cout << "ERROR - Lexeme is too long" << std::endl;
-
-    lexeme[lexLen++] = nextChar;
-    lexeme[lexLen] = 0;
+    lexeme.push_back(nextChar);
 }
 
 void getChar()
 {
-    if ((nextChar = getc(in_fp)) == EOF)
+    if (!readFile.get(nextChar))
     {
         charClass = EOF;
         return;
@@ -95,16 +90,12 @@ void getChar()
         charClass = UNKNOWN;
 }
 
-void skipWhitespace()
-{
-    while (isspace(nextChar))
-        getChar();
-}
-
 int lex()
 {
-    lexLen = 0;
-    skipWhitespace();
+    lexeme.clear();
+    while (isspace(nextChar))
+        getChar();
+
     switch (charClass)
     {
     case LETTER:
@@ -129,10 +120,7 @@ int lex()
         break;
     case EOF:
         nextToken = EOF;
-        lexeme[0] = 'E';
-        lexeme[1] = 'O';
-        lexeme[2] = 'F';
-        lexeme[3] = 0;
+        lexeme = "EOF";
         break;
     }
 
