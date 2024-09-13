@@ -1,5 +1,7 @@
-#include <stdio.h>
 #include <ctype.h>
+#include <iostream>
+#include <unordered_map>
+#include <string>
 
 // Variables
 int charClass;
@@ -13,7 +15,7 @@ FILE *in_fp, *fopen();
 // Functions
 void addChar();
 void getChar();
-void getNonBlank();
+void skipWhitespace();
 int lex();
 
 // Character classes
@@ -35,82 +37,65 @@ int lex();
 int main()
 {
     if ((in_fp = fopen("../front.in", "r")) == nullptr)
-        printf("ERROR - cannot open front.in \n");
-    else
     {
-        getChar();
-        do
-        {
-            lex();
-        }
-        while (nextToken != EOF);
+        std::cout << "ERROR - Cannot open front.in" << std::endl;
+        return EXIT_FAILURE;
     }
+
+    getChar();
+    do
+    {
+        lex();
+    } while (nextToken != EOF);
+
+    return EXIT_SUCCESS;
 }
 
 int lookUp(char ch)
 {
-    switch (ch)
-    {
-        case '(':
-            addChar();
-            nextToken = LEFT_PAREN;
-            break;
-        case ')':
-            addChar();
-            nextToken = RIGHT_PAREN;
-            break;
-        case '+':
-            addChar();
-            nextToken = ADD_OP;
-            break;
-        case '-':
-            addChar();
-            nextToken = SUB_OP;
-            break;
-        case '*':
-            addChar();
-            nextToken = MULT_OP;
-            break;
-        case '/':
-            addChar();
-            nextToken = DIV_OP;
-            break;
-        default:
-            addChar();
-            nextToken = EOF;
-            break;
-    }
+    static const std::unordered_map<char, int> tokenMap = {
+        {'(', LEFT_PAREN},
+        {')', RIGHT_PAREN},
+        {'+', ADD_OP},
+        {'-', SUB_OP},
+        {'*', MULT_OP},
+        {'/', DIV_OP},
+    };
+
+    addChar();
+
+    auto it = tokenMap.find(ch);
+    nextToken = (it != tokenMap.end()) ? it->second : EOF;
 
     return nextToken;
 }
 
 void addChar()
 {
-    if (lexLen <= 98)
-    {
-        lexeme[lexLen++] = nextChar;
-        lexeme[lexLen] = 0;
-    }
-    else
-        printf("Error - lexeme is too long \n");
+    if (lexLen >= 99)
+        std::cout << "ERROR - Lexeme is too long" << std::endl;
+
+    lexeme[lexLen++] = nextChar;
+    lexeme[lexLen] = 0;
 }
 
 void getChar()
 {
-    if ((nextChar = getc(in_fp)) != EOF)
+    if ((nextChar = getc(in_fp)) == EOF)
     {
-        if (isalpha(nextChar))
-            charClass = LETTER;
-        else if (isdigit(nextChar))
-            charClass = DIGIT;
-        else
-            charClass = UNKNOWN;
-    }
-    else
         charClass = EOF;
+        return;
+    }
+
+    if (isalpha(nextChar))
+        charClass = LETTER;
+    else if (isdigit(nextChar))
+        charClass = DIGIT;
+    else
+        charClass = UNKNOWN;
 }
 
-void getNonBlank()
+void skipWhitespace()
 {
     while (isspace(nextChar))
         getChar();
@@ -119,41 +104,38 @@ void getNonBlank()
 int lex()
 {
     lexLen = 0;
-    getNonBlank();
+    skipWhitespace();
     switch (charClass)
     {
-        case LETTER:
+    case LETTER:
+        do
+        {
             addChar();
             getChar();
-            while (charClass == LETTER || charClass == DIGIT)
-            {
-                addChar();
-                getChar();
-            }
-            nextToken = IDENT;
-            break;
-        case DIGIT:
+        } while (charClass == LETTER || charClass == DIGIT);
+        nextToken = IDENT;
+        break;
+    case DIGIT:
+        do
+        {
             addChar();
             getChar();
-            while (charClass == DIGIT)
-            {
-                addChar();
-                getChar();
-            }
-            nextToken = INT_LIT;
-            break;
-        case UNKNOWN:
-            lookUp(nextChar);
-            getChar();
-            break;
-        case EOF:
-            nextToken = EOF;
-            lexeme[0] = 'E';
-            lexeme[1] = 'O';
-            lexeme[2] = 'F';
-            lexeme[3] = 0;
-            break;
+        } while (charClass == DIGIT);
+        nextToken = INT_LIT;
+        break;
+    case UNKNOWN:
+        lookUp(nextChar);
+        getChar();
+        break;
+    case EOF:
+        nextToken = EOF;
+        lexeme[0] = 'E';
+        lexeme[1] = 'O';
+        lexeme[2] = 'F';
+        lexeme[3] = 0;
+        break;
     }
-    printf("Next token is: %d, Next lexeme is %s\n", nextToken, lexeme);
+
+    std::cout << "Next token is: " << nextToken << ", Next lexeme is " << lexeme << std::endl;
     return nextToken;
 }
