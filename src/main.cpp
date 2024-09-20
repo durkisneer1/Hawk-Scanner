@@ -1,129 +1,67 @@
 #include <iostream>
-#include <unordered_map>
-#include <string>
-#include <fstream>
 
-// Variables
-int charClass;
-std::string lexeme;
-char nextChar;
+#include "Constants.hpp"
+#include "Lexical.hpp"
+
+void expr();
+void term();
+void factor();
+
+LexicalAnalyzer lexical("../front.in");
 int nextToken;
-std::ifstream readFile;
-
-// Functions
-void addChar();
-void getChar();
-int lex();
-
-// Character classes
-#define LETTER 0
-#define DIGIT 1
-#define UNKNOWN 99
-
-// Token codes
-#define INT_LIT 10
-#define IDENT 11
-#define ASSIGN_OP 20
-#define ADD_OP 21
-#define SUB_OP 22
-#define MULT_OP 23
-#define DIV_OP 24
-#define LEFT_PAREN 25
-#define RIGHT_PAREN 26
 
 int main()
 {
-    readFile.open("../front.in");
-    if (!readFile.is_open())
-    {
-        std::cerr << "ERROR - Cannot open front.in" << std::endl;
-        return EXIT_FAILURE;
-    }
+    nextToken = lexical.lex();
+    expr();
 
-    getChar();
-    do
-    {
-        lex();
-    } while (nextToken != EOF);
-
-    readFile.close();
     return EXIT_SUCCESS;
 }
 
-int lookUp(char ch)
+void expr()
 {
-    static const std::unordered_map<char, int> tokenMap = {
-        {'(', LEFT_PAREN},
-        {')', RIGHT_PAREN},
-        {'+', ADD_OP},
-        {'-', SUB_OP},
-        {'*', MULT_OP},
-        {'/', DIV_OP},
-    };
-
-    addChar();
-
-    auto it = tokenMap.find(ch);
-    nextToken = (it != tokenMap.end()) ? it->second : EOF;
-
-    return nextToken;
-}
-
-void addChar()
-{
-    lexeme.push_back(nextChar);
-}
-
-void getChar()
-{
-    if (!readFile.get(nextChar))
+    std::cout << "Enter <expr>\n";
+    term();
+    while (nextToken == ADD_OP || nextToken == SUB_OP)
     {
-        charClass = EOF;
-        return;
+        nextToken = lexical.lex();
+        term();
     }
+    std::cout << "Exit <expr>\n";
+}
 
-    if (isalpha(nextChar))
-        charClass = LETTER;
-    else if (isdigit(nextChar))
-        charClass = DIGIT;
+void term()
+{
+    std::cout << "Enter <term>\n";
+    factor();
+    while (nextToken == MULT_OP || nextToken == DIV_OP)
+    {
+        nextToken = lexical.lex();
+        factor();
+    }
+    std::cout << "Exit <term>\n";
+}
+
+void factor()
+{
+    std::cout << "Enter <factor>\n";
+    if (nextToken == IDENT || nextToken == INT_LIT)
+        nextToken = lexical.lex();
     else
-        charClass = UNKNOWN;
-}
-
-int lex()
-{
-    lexeme.clear();
-    while (isspace(nextChar))
-        getChar();
-
-    switch (charClass)
     {
-    case LETTER:
-        do
+        if (nextToken == LEFT_PAREN)
         {
-            addChar();
-            getChar();
-        } while (charClass == LETTER || charClass == DIGIT);
-        nextToken = IDENT;
-        break;
-    case DIGIT:
-        do
+            nextToken = lexical.lex();
+            expr();
+            if (nextToken == RIGHT_PAREN)
+                nextToken = lexical.lex();
+            else
+                std::cerr << "Error: Expected ')'\n";
+        }
+        else
         {
-            addChar();
-            getChar();
-        } while (charClass == DIGIT);
-        nextToken = INT_LIT;
-        break;
-    case UNKNOWN:
-        lookUp(nextChar);
-        getChar();
-        break;
-    case EOF:
-        nextToken = EOF;
-        lexeme = "EOF";
-        break;
+            std::cerr << "Error: Expected '(', identifier, or integer literal\n";
+        }
     }
-
-    std::cout << "Next token is: " << nextToken << ", Next lexeme is " << lexeme << std::endl;
-    return nextToken;
+    std::cout << "Exit <factor>\n";
 }
