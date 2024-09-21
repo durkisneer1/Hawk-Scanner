@@ -15,3 +15,10 @@
 #define DIV_OP 24
 #define LEFT_PAREN 25
 #define RIGHT_PAREN 26
+
+#define PROGRAM 30
+#define BEGIN 31
+#define END 32
+#define COLON 33
+#define SEMIC 34
+#define COMMA 35

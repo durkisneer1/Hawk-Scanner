@@ -3,9 +3,16 @@
 #include "Constants.hpp"
 #include "Lexical.hpp"
 
-void expr();
-void term();
-void factor();
+void match(int expectedToken);
+
+void program();
+void declSec();
+void decl();
+void idList();
+void id();
+void type();
+void stmtSec();
+void stmt();
 
 LexicalAnalyzer lexical("../front.in");
 int nextToken;
@@ -13,55 +20,95 @@ int nextToken;
 int main()
 {
     nextToken = lexical.lex();
-    expr();
+    program();
 
     return EXIT_SUCCESS;
 }
 
-void expr()
+void match(int expectedToken)
 {
-    std::cout << "Enter <expr>\n";
-    term();
-    while (nextToken == ADD_OP || nextToken == SUB_OP)
-    {
-        nextToken = lexical.lex();
-        term();
-    }
-    std::cout << "Exit <expr>\n";
-}
-
-void term()
-{
-    std::cout << "Enter <term>\n";
-    factor();
-    while (nextToken == MULT_OP || nextToken == DIV_OP)
-    {
-        nextToken = lexical.lex();
-        factor();
-    }
-    std::cout << "Exit <term>\n";
-}
-
-void factor()
-{
-    std::cout << "Enter <factor>\n";
-    if (nextToken == IDENT || nextToken == INT_LIT)
+    if (nextToken == expectedToken)
         nextToken = lexical.lex();
     else
+        std::cerr << "ERROR!\n";
+}
+
+void program()
+{
+    std::cout << "PROGRAM\n";
+    if (nextToken == PROGRAM)
     {
-        if (nextToken == LEFT_PAREN)
+        match(PROGRAM);
+        declSec();
+        if (nextToken == BEGIN)
         {
-            nextToken = lexical.lex();
-            expr();
-            if (nextToken == RIGHT_PAREN)
-                nextToken = lexical.lex();
-            else
-                std::cerr << "Error: Expected ')'\n";
-        }
-        else
-        {
-            std::cerr << "Error: Expected '(', identifier, or integer literal\n";
+            match(BEGIN);
+            stmtSec();
         }
     }
-    std::cout << "Exit <factor>\n";
+}
+
+void declSec()
+{
+    std::cout << "DECL_SEC\n";
+    do
+    {
+        decl();
+    } while (nextToken != BEGIN);
+}
+
+void decl()
+{
+    std::cout << "DECL\n";
+    idList();
+    if (nextToken == COLON)
+    {
+        match(COLON);
+        type();
+        if (nextToken == SEMIC)
+        {
+            match(SEMIC);
+        }
+    }
+}
+
+void idList()
+{
+    std::cout << "ID_LIST\n";
+    id();
+    if (nextToken == COMMA)
+    {
+        match(COMMA);
+        idList();
+    }
+}
+
+void id()
+{
+    std::cout << "ID\n";
+    if (nextToken == IDENT)
+    {
+        match(IDENT);
+    }
+}
+
+void type()
+{
+    std::cout << "TYPE\n";
+    if (nextToken == INT_LIT)
+    {
+        match(INT_LIT);
+    }
+}
+
+void stmtSec()
+{
+    std::cout << "STMT_SEC\n";
+    stmt();
+}
+
+void stmt()
+{
+    std::cout << "STMT\n";
+    
 }
