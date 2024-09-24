@@ -13,6 +13,15 @@ void id();
 void type();
 void stmtSec();
 void stmt();
+void assign();
+void ifstmt();
+void whilestmt();
+void input();
+void output();
+void expr();
+void factor();
+void operand();
+void num();
 
 LexicalAnalyzer lexical("../front.in");
 int nextToken;
@@ -39,22 +48,19 @@ void program()
     if (nextToken == PROGRAM)
     {
         match(PROGRAM);
-        declSec();
-        if (nextToken == BEGIN)
-        {
-            match(BEGIN);
-            stmtSec();
-        }
+        if (nextToken != BEGIN)
+            declSec();
+        match(BEGIN);
+        stmtSec();
     }
 }
 
 void declSec()
 {
     std::cout << "DECL_SEC\n";
-    do
-    {
-        decl();
-    } while (nextToken != BEGIN);
+    decl();
+    if (nextToken != BEGIN)
+        declSec();
 }
 
 void decl()
@@ -105,10 +111,87 @@ void stmtSec()
 {
     std::cout << "STMT_SEC\n";
     stmt();
+    if (nextToken != END)
+        stmtSec();
 }
 
 void stmt()
 {
     std::cout << "STMT\n";
-    
+    switch (nextToken)
+    {
+    case IDENT:
+        assign();
+        break;
+    case IF:
+        ifstmt();
+        break;
+    case WHILE:
+        whilestmt();
+        break;
+    case INPUT:
+        input();
+        break;
+    case OUTPUT:
+        output();
+        break;
+    }
+}
+
+void assign()
+{
+    std::cout << "ASSIGN\n";
+    id();
+    if (nextToken == COLON)
+    {
+        match(COLON);
+        if (nextToken == EQUAL_OP)
+        {
+            match(EQUAL_OP);
+            expr();
+        }
+    }
+}
+
+void ifstmt()
+{
+    std::cout << "IFSTMT\n";
+}
+
+void whilestmt()
+{
+    std::cout << "WHILESTMT\n";
+}
+
+void input()
+{
+    std::cout << "INPUT\n";
+}
+
+void output()
+{
+    std::cout << "OUTPUT\n";
+}
+
+void expr()
+{
+    std::cout << "EXPR\n";
+    factor();
+}
+
+void factor()
+{
+    std::cout << "FACTOR\n";
+    operand();
+}
+
+void operand()
+{
+    std::cout << "OPERAND\n";
+    num();
+}
+
+void num()
+{
+    std::cout << "NUM\n";
 }

@@ -8,7 +8,7 @@
 // Token codes
 #define INT_LIT 10
 #define IDENT 11
-#define ASSIGN_OP 20
+#define EQUAL_OP 20
 #define ADD_OP 21
 #define SUB_OP 22
 #define MULT_OP 23
@@ -22,3 +22,7 @@
 #define COLON 33
 #define SEMIC 34
 #define COMMA 35
+#define IF 36
+#define WHILE 37
+#define INPUT 38
+#define OUTPUT 39

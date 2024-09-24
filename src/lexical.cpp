@@ -20,13 +20,16 @@ LexicalAnalyzer::~LexicalAnalyzer()
 void LexicalAnalyzer::lookUp(char ch)
 {
     static const std::unordered_map<char, int> tokenMap = {
-        {'=', ASSIGN_OP},
+        {'=', EQUAL_OP},
         {'+', ADD_OP},
         {'-', SUB_OP},
         {'*', MULT_OP},
         {'/', DIV_OP},
         {'(', LEFT_PAREN},
         {')', RIGHT_PAREN},
+        {':', COLON},
+        {';', SEMIC},
+        {',', COMMA},
     };
 
     addChar();
@@ -56,6 +59,13 @@ void LexicalAnalyzer::getChar()
 
 int LexicalAnalyzer::lex()
 {
+    static const std::unordered_map<std::string, int> reservedWords = {
+        {"if", IF},
+        {"while", WHILE},
+        {"input", INPUT},
+        {"output", OUTPUT},
+    };
+
     lexeme.clear();
     while (isspace(nextChar))
         getChar();
@@ -68,7 +78,7 @@ int LexicalAnalyzer::lex()
             addChar();
             getChar();
         } while (charClass == LETTER || charClass == DIGIT);
-        nextToken = IDENT;
+        nextToken = (reservedWords.find(lexeme) != reservedWords.end()) ? reservedWords.at(lexeme) : IDENT;
         break;
     case DIGIT:
         do
