@@ -30,7 +30,7 @@ The Hawk language scanner is designed to read source code written in Hawk, ident
    ```bash
    meson compile
    ```
-5. Run `scanner.exe` through a terminal to view output.
+5. Run `scanner.exe` through a terminal to view trace output.
 
 ## Requirements
 - C++ compiler (e.g., g++ or clang++)
@@ -43,4 +43,4 @@ The Hawk language scanner is designed to read source code written in Hawk, ident
 - `test/`: Sample Hawk programs for testing the scanner.
 
 ## License
-This project is for educational purposes and is licensed under the MIT License.
+This project is for educational purposes and is licensed under the [MIT License](https://github.com/durkisneer1/Lexical-Analyzer/blob/main/LICENSE).
