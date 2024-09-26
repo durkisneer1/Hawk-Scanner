@@ -55,8 +55,19 @@ void Lexer::getChar()
 
     if (isalpha(nextChar))
         charClass = LETTER;
-    else if (isdigit(nextChar) || nextChar == '.')
+    else if (isdigit(nextChar))
+    {
         charClass = DIGIT;
+        lastCharClass = DIGIT;
+    }
+    else if (nextChar == '.')
+    {
+        if (lastCharClass == DIGIT)
+            charClass = DIGIT;
+        else
+            charClass = UNKNOWN;
+        lastCharClass = UNKNOWN;
+    }
     else
         charClass = UNKNOWN;
 }

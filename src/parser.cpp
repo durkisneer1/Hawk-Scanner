@@ -11,12 +11,6 @@ Parser::Parser(Lexer *lexer)
     nextToken = lexer->lex();
 }
 
-Parser::~Parser()
-{
-    for (const auto &id : idTable)
-        std::cout << "ID: " << id << "\n";
-}
-
 bool Parser::accept(int token)
 {
     if (nextToken == token)
@@ -39,6 +33,11 @@ void Parser::error(const std::string &message)
 {
     std::cerr << lexer->getLine() << " " << message;
     abort();
+}
+
+bool Parser::idExists(const std::string &id)
+{
+    return std::find(idTable.begin(), idTable.end(), id) != idTable.end();
 }
 
 void Parser::run()
@@ -76,7 +75,7 @@ void Parser::idList(bool isDeclaring)
         idTable.push_back(lexer->getLexeme());
     else
     {
-        if (std::find(idTable.begin(), idTable.end(), lexer->getLexeme()) == idTable.end())
+        if (!idExists(lexer->getLexeme()))
             error("ID_LIST: Undeclared identifier\n");
     }
     expect(IDENT);
@@ -121,6 +120,8 @@ void Parser::assign()
 {
     std::cout << "ASSIGN\n";
 
+    if (!idExists(lexer->getLexeme()))
+        error("ASSIGN: Undeclared identifier\n");
     expect(IDENT);
     expect(COLON);
     expect(EQUAL_OP);
@@ -204,7 +205,13 @@ void Parser::operand()
         expr();
         expect(RIGHT_PAREN);
     }
-    else if (!accept(NUM) && !accept(IDENT))
+    else if (nextToken == IDENT)
+    {
+        if (!idExists(lexer->getLexeme()))
+            error("OPERAND: Undeclared identifier\n");
+        expect(IDENT);
+    }
+    else if (!accept(NUM))
         error("OPERAND: Syntax error\n");
 }
 

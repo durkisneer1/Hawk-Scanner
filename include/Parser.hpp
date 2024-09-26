@@ -9,7 +9,7 @@ class Parser
 {
 public:
     explicit Parser(Lexer *lexer);
-    ~Parser();
+    ~Parser() = default;
 
     void run();
 
@@ -21,6 +21,7 @@ private:
     bool accept(int token);
     bool expect(int token);
     void error(const std::string &message);
+    bool idExists(const std::string &id);
 
     void declSec();
     void decl();

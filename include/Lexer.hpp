@@ -18,6 +18,7 @@ public:
 
 private:
     int charClass;
+    int lastCharClass;
     std::string lexeme;
     char nextChar;
     int nextToken;
