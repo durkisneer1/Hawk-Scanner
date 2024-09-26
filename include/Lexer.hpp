@@ -3,16 +3,17 @@
 #include <string>
 #include <fstream>
 
-class LexicalAnalyzer
+class Lexer
 {
 public:
-    explicit LexicalAnalyzer(const std::string &fileName);
-    ~LexicalAnalyzer();
+    explicit Lexer(const std::string &fileName);
+    ~Lexer();
 
     void lookUp(char ch);
     void addChar();
     void getChar();
     int lex();
+    std::string getLine();
 
 private:
     int charClass;
@@ -20,4 +21,7 @@ private:
     char nextChar;
     int nextToken;
     std::ifstream readFile;
+    int currentRow = 0;
+    int currentColumn = 0;
+    std::string fileName;
 };

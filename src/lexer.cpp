@@ -1,23 +1,25 @@
 #include <iostream>
 #include <unordered_map>
+#include <fmt/format.h>
 
-#include "Lexical.hpp"
+#include "Lexer.hpp"
 #include "Constants.hpp"
 
-LexicalAnalyzer::LexicalAnalyzer(const std::string &fileName)
+Lexer::Lexer(const std::string &fileName)
 {
     readFile.open(fileName);
     if (!readFile.is_open())
         throw std::runtime_error("ERROR - Cannot open " + fileName);
+    this->fileName = fileName;
     getChar();
 }
 
-LexicalAnalyzer::~LexicalAnalyzer()
+Lexer::~Lexer()
 {
     readFile.close();
 }
 
-void LexicalAnalyzer::lookUp(char ch)
+void Lexer::lookUp(char ch)
 {
     static const std::unordered_map<char, int> tokenMap = {
         {'=', EQUAL_OP},
@@ -30,18 +32,20 @@ void LexicalAnalyzer::lookUp(char ch)
         {':', COLON},
         {';', SEMIC},
         {',', COMMA},
+        {'<', LT_OP},
+        {'>', GT_OP},
     };
 
     addChar();
     nextToken = (tokenMap.find(ch) != tokenMap.end()) ? tokenMap.at(ch) : UNKNOWN;
 }
 
-void LexicalAnalyzer::addChar()
+void Lexer::addChar()
 {
     lexeme.push_back(nextChar);
 }
 
-void LexicalAnalyzer::getChar()
+void Lexer::getChar()
 {
     if (!readFile.get(nextChar))
     {
@@ -51,30 +55,48 @@ void LexicalAnalyzer::getChar()
 
     if (isalpha(nextChar))
         charClass = LETTER;
-    else if (isdigit(nextChar))
+    else if (isdigit(nextChar) || nextChar == '.')
         charClass = DIGIT;
     else
         charClass = UNKNOWN;
 }
 
-int LexicalAnalyzer::lex()
+int Lexer::lex()
 {
     static const std::unordered_map<std::string, int> reservedWords = {
+        {"program", PROGRAM},
+        {"begin", BEGIN},
+        {"end", END},
         {"if", IF},
         {"while", WHILE},
         {"input", INPUT},
         {"output", OUTPUT},
+        {"then", THEN},
+        {"else", ELSE},
+        {"loop", LOOP},
+        {"int", INT_TYPE},
+        {"float", FLOAT_TYPE},
+        {"double", DOUBLE_TYPE},
     };
 
     lexeme.clear();
     while (isspace(nextChar))
+    {
+        if (nextChar == '\n')
+        {
+            currentRow++;
+            currentColumn = 0;
+        }
+        currentColumn++;
         getChar();
+    }
 
     switch (charClass)
     {
     case LETTER:
         do
         {
+            currentColumn++;
             addChar();
             getChar();
         } while (charClass == LETTER || charClass == DIGIT);
@@ -83,12 +105,14 @@ int LexicalAnalyzer::lex()
     case DIGIT:
         do
         {
+            currentColumn++;
             addChar();
             getChar();
         } while (charClass == DIGIT);
-        nextToken = INT_LIT;
+        nextToken = NUM;
         break;
     case UNKNOWN:
+        currentColumn++;
         lookUp(nextChar);
         getChar();
         break;
@@ -98,6 +122,10 @@ int LexicalAnalyzer::lex()
         break;
     }
 
-    std::cout << "Next token is: " << nextToken << ", Next lexeme is " << lexeme << std::endl;
     return nextToken;
+}
+
+std::string Lexer::getLine()
+{
+    return fmt::format("{}:{}:{}", fileName, currentRow, currentColumn);
 }

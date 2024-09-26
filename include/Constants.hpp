@@ -5,9 +5,14 @@
 #define DIGIT 1
 #define UNKNOWN 99
 
-// Token codes
-#define INT_LIT 10
-#define IDENT 11
+// Data type codes
+#define NUM 11
+#define IDENT 12
+#define INT_TYPE 13
+#define FLOAT_TYPE 14
+#define DOUBLE_TYPE 15
+
+// Lexeme codes
 #define EQUAL_OP 20
 #define ADD_OP 21
 #define SUB_OP 22
@@ -15,14 +20,18 @@
 #define DIV_OP 24
 #define LEFT_PAREN 25
 #define RIGHT_PAREN 26
-
-#define PROGRAM 30
-#define BEGIN 31
-#define END 32
-#define COLON 33
-#define SEMIC 34
-#define COMMA 35
-#define IF 36
-#define WHILE 37
-#define INPUT 38
-#define OUTPUT 39
+#define PROGRAM 27
+#define BEGIN 28
+#define END 29
+#define COLON 30
+#define SEMIC 31
+#define COMMA 32
+#define IF 33
+#define WHILE 34
+#define INPUT 35
+#define OUTPUT 36
+#define THEN 37
+#define ELSE 38
+#define LOOP 39
+#define LT_OP 40
+#define GT_OP 41

@@ -1,0 +1,1 @@
+sources = ['src/lexer.cpp', 'src/parser.cpp']

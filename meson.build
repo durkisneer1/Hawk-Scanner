@@ -1,6 +1,11 @@
-project('lexical analyzer', 'cpp')
+project('scanner', 'cpp')
+
+subdir('src')
 
 inc = include_directories('include')
-src = ['src/main.cpp', 'src/lexical.cpp']
+src = ['main.cpp'] + sources
 
-executable('lex', sources: src, include_directories: inc)
+fmt = subproject('fmt')
+fmt_dep = fmt.get_variable('fmt_header_only_dep')
+
+executable('scanner', sources: src, include_directories: inc, dependencies: fmt_dep)
