@@ -3,7 +3,7 @@
 
 int main()
 {
-    Lexer lexer("../main.hawk");
+    Lexer lexer("../test/moderate.hawk");
     Parser parser(&lexer);
     parser.run();
 
