@@ -13,6 +13,7 @@ public:
     void addChar();
     void getChar();
     int lex();
+    std::string getLexeme();
     std::string getLine();
 
 private:
@@ -21,7 +22,7 @@ private:
     char nextChar;
     int nextToken;
     std::ifstream readFile;
-    int currentRow = 0;
-    int currentColumn = 0;
+    int currentLine = 1;
+    int currentColumn = 1;
     std::string fileName;
 };

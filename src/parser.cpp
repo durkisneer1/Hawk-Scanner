@@ -11,6 +11,12 @@ Parser::Parser(Lexer *lexer)
     nextToken = lexer->lex();
 }
 
+Parser::~Parser()
+{
+    for (const auto &id : idTable)
+        std::cout << "ID: " << id << "\n";
+}
+
 bool Parser::accept(int token)
 {
     if (nextToken == token)
@@ -32,6 +38,7 @@ bool Parser::expect(int token)
 void Parser::error(const std::string &message)
 {
     std::cerr << lexer->getLine() << " " << message;
+    abort();
 }
 
 void Parser::run()
@@ -54,20 +61,27 @@ void Parser::decl()
 {
     std::cout << "DECL\n";
 
-    idList();
+    idList(true);
     expect(COLON);
     if (!accept(INT_TYPE) && !accept(FLOAT_TYPE) && !accept(DOUBLE_TYPE))
         error("DECL: Invalid data type\n");
     expect(SEMIC);
 }
 
-void Parser::idList()
+void Parser::idList(bool isDeclaring)
 {
     std::cout << "ID_LIST\n";
 
+    if (isDeclaring)
+        idTable.push_back(lexer->getLexeme());
+    else
+    {
+        if (std::find(idTable.begin(), idTable.end(), lexer->getLexeme()) == idTable.end())
+            error("ID_LIST: Undeclared identifier\n");
+    }
     expect(IDENT);
     if (accept(COMMA))
-        idList();
+        idList(isDeclaring);
 }
 
 void Parser::stmtSec()

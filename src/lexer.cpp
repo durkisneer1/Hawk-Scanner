@@ -84,8 +84,8 @@ int Lexer::lex()
     {
         if (nextChar == '\n')
         {
-            currentRow++;
-            currentColumn = 0;
+            currentLine++;
+            currentColumn = 1;
         }
         currentColumn++;
         getChar();
@@ -127,5 +127,10 @@ int Lexer::lex()
 
 std::string Lexer::getLine()
 {
-    return fmt::format("{}:{}:{}", fileName, currentRow, currentColumn);
+    return fmt::format("{}:{}:{}", fileName, currentLine, currentColumn);
+}
+
+std::string Lexer::getLexeme()
+{
+    return lexeme;
 }
