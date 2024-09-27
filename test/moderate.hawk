@@ -4,7 +4,7 @@ program
     d: float;
 begin
     input x, d;
-    y := 10.5;
+    y := 0.5234324234234;
     if (x > 0) then
         e := 0;
         while (x > 0)

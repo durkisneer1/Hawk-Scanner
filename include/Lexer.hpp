@@ -19,6 +19,7 @@ public:
 private:
     int charClass;
     int lastCharClass;
+    bool pointExists = false; // Making sure real nums only have one point
     std::string lexeme;
     char nextChar;
     int nextToken;

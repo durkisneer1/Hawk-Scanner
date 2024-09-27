@@ -62,8 +62,11 @@ void Lexer::getChar()
     }
     else if (nextChar == '.')
     {
-        if (lastCharClass == DIGIT)
+        if (lastCharClass == DIGIT && !pointExists)
+        {
             charClass = DIGIT;
+            pointExists = true;
+        }
         else
             charClass = UNKNOWN;
         lastCharClass = UNKNOWN;
@@ -121,6 +124,7 @@ int Lexer::lex()
             getChar();
         } while (charClass == DIGIT);
         nextToken = NUM;
+        pointExists = false;
         break;
     case UNKNOWN:
         currentColumn++;
