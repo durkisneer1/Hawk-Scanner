@@ -30,7 +30,7 @@ The Hawk language scanner is designed to read source code written in Hawk, ident
    ```bash
    meson compile
    ```
-5. Run `scanner.exe` through a terminal to view trace output.
+5. Run `scanner.exe <filepath>` within a terminal to view trace output.
 
 ## Requirements
 - C++ compiler (e.g., g++ or clang++)
