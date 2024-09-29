@@ -1,7 +1,7 @@
-program x, y: int;
-
+program
+    x, y: int;
 begin
     input x, y;
-    y := x +y;
+    y := y + x;
     output y;
 end;

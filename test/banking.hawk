@@ -1,0 +1,39 @@
+program
+    balance, deposit_amount, withdrawal_amount, interest_rate, years, interest: double;
+    action: int;
+begin
+    balance := 0;
+    interest_rate := 0.03;
+    action := 0;
+
+    input balance;
+
+    while (action <> 5) loop
+        input action;
+
+        if (action = 1) then
+            input deposit_amount;
+            balance := balance + deposit_amount;
+        end if;
+
+        if (action = 2) then
+            input withdrawal_amount;
+            if (withdrawal_amount > balance) then
+                balance := balance;
+            else
+                balance := balance - withdrawal_amount;
+            end if;
+        end if;
+
+        if (action = 3) then
+            output balance;
+        end if;
+
+        if (action = 4) then
+            input years;
+            interest := balance * (1 + interest_rate * years) - balance;
+            balance := balance + interest;
+            output balance;
+        end if;
+    end loop;
+end;

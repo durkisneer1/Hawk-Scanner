@@ -6,11 +6,11 @@
 #include "Constants.hpp"
 
 Lexer::Lexer(const std::string &fileName)
+    : fileName(fileName)
 {
     readFile.open(fileName);
     if (!readFile.is_open())
         throw std::runtime_error("ERROR - Cannot open " + fileName);
-    this->fileName = fileName;
     getChar();
 }
 
@@ -53,26 +53,22 @@ void Lexer::getChar()
         return;
     }
 
-    if (isalpha(nextChar))
+    if (isalpha(nextChar) || nextChar == '_')
         charClass = LETTER;
     else if (isdigit(nextChar))
     {
         charClass = DIGIT;
-        lastCharClass = DIGIT;
+        digitCount++;
     }
-    else if (nextChar == '.')
+    else if (nextChar == '.' && lastCharClass == DIGIT && !pointExists)
     {
-        if (lastCharClass == DIGIT && !pointExists)
-        {
-            charClass = DIGIT;
-            pointExists = true;
-        }
-        else
-            charClass = UNKNOWN;
-        lastCharClass = UNKNOWN;
+        charClass = DIGIT;
+        pointExists = true;
     }
     else
         charClass = UNKNOWN;
+
+    lastCharClass = charClass;
 }
 
 int Lexer::lex()
@@ -114,6 +110,7 @@ int Lexer::lex()
             addChar();
             getChar();
         } while (charClass == LETTER || charClass == DIGIT);
+
         nextToken = (reservedWords.find(lexeme) != reservedWords.end()) ? reservedWords.at(lexeme) : IDENT;
         break;
     case DIGIT:
@@ -123,6 +120,11 @@ int Lexer::lex()
             addChar();
             getChar();
         } while (charClass == DIGIT);
+
+        if (digitCount > 10)
+            throw std::runtime_error(fmt::format("ERROR - Too many digits at {}", getLine()));
+
+        digitCount = 0;
         nextToken = NUM;
         pointExists = false;
         break;

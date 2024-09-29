@@ -6,10 +6,7 @@
 #include "Constants.hpp"
 
 Parser::Parser(Lexer *lexer)
-    : lexer(lexer)
-{
-    nextToken = lexer->lex();
-}
+    : lexer(lexer), nextToken(lexer->lex()) {}
 
 bool Parser::accept(int token)
 {
@@ -73,11 +70,9 @@ void Parser::idList(bool isDeclaring)
 
     if (isDeclaring)
         idTable.push_back(lexer->getLexeme());
-    else
-    {
-        if (!idExists(lexer->getLexeme()))
-            error("ID_LIST: Undeclared identifier\n");
-    }
+    else if (!idExists(lexer->getLexeme()))
+        error("ID_LIST: Undeclared identifier\n");
+
     expect(IDENT);
     if (accept(COMMA))
         idList(isDeclaring);
@@ -113,6 +108,8 @@ void Parser::stmt()
     case OUTPUT:
         output();
         break;
+    default:
+        error("STMT: Unexpected token\n");
     }
 }
 
@@ -122,6 +119,7 @@ void Parser::assign()
 
     if (!idExists(lexer->getLexeme()))
         error("ASSIGN: Undeclared identifier\n");
+
     expect(IDENT);
     expect(COLON);
     expect(EQUAL_OP);
