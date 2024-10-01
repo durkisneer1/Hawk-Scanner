@@ -2,7 +2,7 @@
 This repository contains a **scanner** for the made-up language **Hawk**, developed as part of the Programming Language Fundamentals course at the **University of Houston Clear Lake**.
 
 ## Project Overview
-The Hawk language scanner is designed to read source code written in Hawk, identify its lexemes and tokens, and check for basic syntax errors. This project focuses on building a **lexical analyzer** (lexer) and a **syntax analyzer** (parser), which together form the core of the scanner.
+The Hawk language scanner is designed to read source code written in Hawk, identify its lexemes and tokens, and check for basic syntax errors. This project focuses on building a **lexical analyzer** (lexer) and a **syntax analyzer** (parser), which together form the core of the scanner. I've also published a VS Code [extension](https://marketplace.visualstudio.com/items?itemName=durkisneer.hawklanghighlight) for syntax highlighting.
 
 ### Components
 1. **Lexical Analyzer (Lexer):**
