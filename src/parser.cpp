@@ -12,6 +12,7 @@ bool Parser::accept(int token)
 {
     if (nextToken == token)
     {
+        lexer->passed();
         nextToken = lexer->lex();
         return true;
     }
@@ -20,16 +21,33 @@ bool Parser::accept(int token)
 
 bool Parser::expect(int token)
 {
+    static const char *tokenNames[] = {
+        "program",
+        ":",
+        ";",
+        "identifier",
+        "=",
+        "if",
+        "then",
+        "end",
+        "while",
+        "loop",
+        "input",
+        "output",
+        "(",
+        ")",
+    };
+
     if (accept(token))
         return true;
-    error(fmt::format("error: expected {}\n", token));
+    error(fmt::format("error: expected '{}'\n", tokenNames[token - 20]));
     return false;
 }
 
 void Parser::error(const std::string &message)
 {
-    std::cerr << lexer->getLine() << " " << message;
-    abort();
+    std::cerr << lexer->getLine() << message;
+    exit(-1);
 }
 
 bool Parser::idExists(const std::string &id)
@@ -60,7 +78,7 @@ void Parser::decl()
     idList(true);
     expect(COLON);
     if (!accept(INT_TYPE) && !accept(FLOAT_TYPE) && !accept(DOUBLE_TYPE))
-        error("DECL: Invalid data type\n");
+        error("error: invalid declaration type\n");
     expect(SEMIC);
 }
 
@@ -71,7 +89,7 @@ void Parser::idList(bool isDeclaring)
     if (isDeclaring)
         idTable.push_back(lexer->getLexeme());
     else if (!idExists(lexer->getLexeme()))
-        error("ID_LIST: Undeclared identifier\n");
+        error("error: undeclared identifier\n");
 
     expect(IDENT);
     if (accept(COMMA))
@@ -109,7 +127,7 @@ void Parser::stmt()
         output();
         break;
     default:
-        error("STMT: Unexpected token\n");
+        error("error: invalid statement\n");
     }
 }
 
@@ -118,7 +136,7 @@ void Parser::assign()
     std::cout << "ASSIGN\n";
 
     if (!idExists(lexer->getLexeme()))
-        error("ASSIGN: Undeclared identifier\n");
+        error("erorr: undeclared identifier\n");
 
     expect(IDENT);
     expect(COLON);
@@ -172,7 +190,7 @@ void Parser::output()
     if (nextToken == IDENT)
         idList();
     else if (!accept(NUM))
-        error("OUTPUT: Unexpected token\n");
+        error("error: unexpected token\n");
     expect(SEMIC);
 }
 
@@ -206,11 +224,11 @@ void Parser::operand()
     else if (nextToken == IDENT)
     {
         if (!idExists(lexer->getLexeme()))
-            error("OPERAND: Undeclared identifier\n");
+            error("error: undeclared identifier\n");
         expect(IDENT);
     }
     else if (!accept(NUM))
-        error("OPERAND: Syntax error\n");
+        error("error: invalid syntax\n");
 }
 
 void Parser::comp()
@@ -222,7 +240,7 @@ void Parser::comp()
     if (accept(LT_OP))
         accept(GT_OP);
     else if (!accept(EQUAL_OP) && !accept(GT_OP))
-        error("COMP: Invalid comparison operator\n");
+        error("error: invalid comparison operator\n");
     operand();
     expect(RIGHT_PAREN);
 }

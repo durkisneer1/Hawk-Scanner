@@ -71,6 +71,11 @@ void Lexer::getChar()
     lastCharClass = charClass;
 }
 
+void Lexer::passed()
+{
+    lastPosition = currentPosition;
+}
+
 int Lexer::lex()
 {
     static const std::unordered_map<std::string, int> reservedWords = {
@@ -94,10 +99,10 @@ int Lexer::lex()
     {
         if (nextChar == '\n')
         {
-            currentLine++;
-            currentColumn = 1;
+            currentPosition.line++;
+            currentPosition.column = 1;
         }
-        currentColumn++;
+        currentPosition.column++;
         getChar();
     }
 
@@ -106,7 +111,7 @@ int Lexer::lex()
     case LETTER:
         do
         {
-            currentColumn++;
+            currentPosition.column++;
             addChar();
             getChar();
         } while (charClass == LETTER || charClass == DIGIT);
@@ -116,20 +121,23 @@ int Lexer::lex()
     case DIGIT:
         do
         {
-            currentColumn++;
+            currentPosition.column++;
             addChar();
             getChar();
         } while (charClass == DIGIT);
 
         if (digitCount > 10)
-            throw std::runtime_error(fmt::format("ERROR - Too many digits at {}", getLine()));
+        {
+            std::cerr << getLine() << "error: too many digits";
+            exit(-1);
+        }
 
         digitCount = 0;
         nextToken = NUM;
         pointExists = false;
         break;
     case UNKNOWN:
-        currentColumn++;
+        currentPosition.column++;
         lookUp(nextChar);
         getChar();
         break;
@@ -144,7 +152,7 @@ int Lexer::lex()
 
 std::string Lexer::getLine()
 {
-    return fmt::format("{}:{}:{}", fileName, currentLine, currentColumn);
+    return fmt::format("{}:{}:{}: ", fileName, lastPosition.line, lastPosition.column);
 }
 
 std::string Lexer::getLexeme()
