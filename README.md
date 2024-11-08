@@ -16,13 +16,13 @@ The Hawk language scanner is designed to read source code written in Hawk, ident
 ## How to Use
 1. Clone the repository:
    ```bash
-   gh repo clone durkisneer1/Lexical-Analyzer
+   gh repo clone durkisneer1/Hawk-Scanner
    ```
-2. Run the `setup.py` file:
+2. Setup the Meson build system:
    ```bash
-   python setup.py
+   meson setup build
    ```
-3. Navigate to the `build` directory:
+3. Change to the `build` directory:
    ```bash
    cd build
    ```

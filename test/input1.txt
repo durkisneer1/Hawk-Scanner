@@ -1,0 +1,10 @@
+
+
+program    x, y: int;
+
+begin
+    input x,y;
+    y:=x+y;
+     output y;
+end;
+
